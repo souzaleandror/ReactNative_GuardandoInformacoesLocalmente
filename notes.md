@@ -300,3 +300,299 @@ Como instalar o AsyncStorage;
 Criar uma nota;
 Salvar a nota dentro do AsyncStorage;
 Mostrar a nota no console.
+
+#### 12/01/2024
+
+@02-Salvando mais notas
+
+@@01
+Projeto da aula anterior
+
+Para acompanhar o curso a partir deste ponto, você pode baixar o projeto completo da aula anterior neste link.
+
+https://github.com/alura-cursos/salvandoLocalmente/archive/refs/heads/aula1.zip
+
+@@02
+Usando um ID dinâmico
+
+[00:00] Vamos deixar a nossa aplicação um pouco mais dinâmica, porque, por enquanto, o nosso ID é estático. Essa já é uma das desvantagens de usar o AsyncStorage, ele não gera um ID automaticamente ou sequencialmente para nós.
+[00:15] Nesse caso, temos a identificação "1" e, toda vez que escrevermos uma nova nota, ele vai sempre sobrescrever a nota com a identificação "1".
+
+[00:24] Vamos criar uma função que vai gerar um ID automaticamente para nós. Só um detalhe: essa função não é completamente segura, ela não é uma função para você enviar para uma produção. Essa é só uma sugestão de como podemos deixá-la um pouco mais dinâmica.
+
+[00:43] Vou criar uma função function geraId() { que vai gerar um ID sequencial. Como assim, sequencial? Primeiro temos que saber quantas notas já existem salvas dentro do meu AsyncStorage. Em seguida, pegamos esse tamanho e só somamos 1.
+
+[01:04] Ou seja, se tiverem três notas, nós assumimos que a nota 1 seja ID 1, nota 2 seja ID 2 e nota 3 seja ID 3. Portanto, se pegarmos o comprimento desse vetor e somarmos 1, teremos o próximo ID. Assim, toda vez que for fazer essa checagem, ele vai sempre somar 1.
+
+[01:23] Como isso pode gerar problemas? Por exemplo, caso o ID 1 seja apagado e geremos um novo ID baseado no tamanho, ele vai simplesmente sobrescrever a última entrada que já foi feita dentro do AsyncStorage.
+
+[01:40] Por isso que eu não recomendo, mas, dado que não vamos ter a opção de apagar uma nota, podemos considerar que esse problema não vai acontecer. Entretanto, tenham este detalhe em mente.
+
+[01:53] Então criei minha função geraId. Como sabemos a quantidade de itens que já estão dentro do AsyncStorage? Vamos para a documentação. Abrindo a documentação, na parte de “Usage” só temos dois exemplos: de como guardar uma informação e de como ler essa informação dentro do AsyncStorage.
+
+[02:16] Queremos saber o que mais o AsyncStorage consegue fazer. Então, no menu da lateral esquerda, clicamos na opção “API”. Nela temos acesso a todas as funções que existem no AsyncStorage.
+
+[02:29] getItem, setItem, mergeItem, removeItem, getAllKeys, e assim por diante. O que criamos aqui foi justamente a função getAllKeys. O que ela faz? Ela retorna todas as chaves que existem da nossa aplicação, dentro do AsyncStorage.
+
+[02:50] Ela retorna dentro de um vetor, um Array<string>, ou seja, se tivermos dez chaves, por exemplo, ela vai retornar para nós todas as dez chaves. Para nós, não importa exatamente qual o valor dessas chaves, mas o comprimento desse Array.
+
+[03:10] Podemos usar essa função para conseguir pegar todas as chaves e, em seguida, pegamos o comprimento e somamos 1. Vamos voltar para o nosso código. Agora, vou salvar dentro de uma constante, a const todasChaves, todas as chaves, = AsyncStorage.getAllKeys(). Assim ele vai retornar todas as chaves.
+
+[03:42] Vamos ver quais são todas as chaves? Para isso, escrevemos console.log(todasChaves). Essa função não foi chamada ainda, podemos chamar, então, antes do mostraNota().
+
+[03:58] Então, geraId() antes do mostraNota. Agora vou abrir nosso emulador. Assim que criarmos uma nova nota, ele deve retornar uma promise.
+
+[04:12] Lembrando, por conta disso, precisamos fazer essa função assíncrona. Ela vai ter que ser um async function geraId(), e precisamos esperar pelo AsyncStorage, então, nela, digitamos await AsyncStorage.getAllKeys().
+
+[04:25] Salvei. Voltei para o nosso emulador e vou salvar uma nova nota. Ele nos trouxe um Array com apenas um valor. Mesmo que eu tenho adicionado agora uma, duas ou três vezes, ele sempre sobrescreveu a primeira nota, o ID 1.
+
+[04:45] Conseguimos pegar todas as chaves e podemos fazer uma verificação primeiro. Vou deixar esse console.log(todasChaves) aqui e faremos uma verificação.
+
+[04:55] Se todas as chaves forem menores ou iguais a 0, ou seja, se não tiver nenhum valor dentro de todas as chaves, if(todasChaves <= 0), podemos retornar return 1. Portanto, o primeiro registro vai ter o ID 1.
+
+[05:13] Caso contrário, como já tem o return ali, podemos só continuar escrevendo. Podemos escrever que, do contrário, return todasChaves.length + 1. Salvei isso, vamos ver o que retorna dentro do nosso ID.
+
+[05:32] Vou dar um console.log(geraId()), dentro do salvaNota(). Vamos ver o que acontece. Vou voltar ao emulador, rodar de novo “Uma nova nota” e o que ele trouxe para nós foi uma promise.
+
+[05:55] Faltou escrever um await nessa função assíncrona, ou seja, console.log(await geraId()). Voltei para o emulador e, olha que legal, ele retorna o nosso Array e depois retorna 2, porque, sequencialmente, seria a segunda nota.
+
+[06:17] Então já está trabalhando a função. Podemos pegar esse geraId e atribuir agora a um valor. Vou recortar essa função, console.log(await geraId()), e, acima do umaNota, vou criar outra constante que vai ser const novoId.
+
+[06:36] Ela vai ser const novoId = await geraId(). No lugar do id que está com "1" em string, podemos colocar o id: novoId. Porém tem um detalhe: o AsyncStorage só consegue guardar strings, tanto a chave quanto o valor.
+
+[06:57] Então, se deixarmos desse jeito, ele vai guardar apenas o valor como inteiro, ou vai ser 1, 2, 3, assim por diante, mas é um valor inteiro, e não uma string.
+
+[07:07] No final da chamada do nosso id: novoId, precisamos colocar a função toString, id: novoId.toString(). Assim ele vai converter o valor dessa nossa função para uma string.
+
+[07:23] Vamos testar se está funcionando. Eu vou printar, depois de salvaNota, e emitir uma nova nota, com console.log(umaNota).
+
+[07:42] Vou apagar os outros console.log para não nos confundir, ou seja, o de dentro de id e o console.log do mostraNota. Salvei meu código, voltei para o emulador e vou gerar uma nova nota.
+
+[08:00] O objeto que foi retornado para nós no console foi com o "id: “2”" e "Uma nova nota". Se eu colocar agora “Nota 3” e clicar em “Salvar”, o nosso objeto de "Uma nova nota" vai ser "id: “3”".
+
+[08:16] Então, nosso geraId() está funcionando. Nosso próximo passo, agora que temos um ID dinâmico e conseguimos salvar várias outras notas, é recuperar todas essas notas e mostrar na nossa tela.
+
+[08:27] Vejo você no próximo vídeo.
+
+@@03
+Pegando todas as entradas
+
+[00:00] Uma coisa interessante é descobrirmos onde vamos chamar a função mostrarNota().
+[00:05] Porque, por enquanto, estávamos chamando essa função dentro do “NotaEditor.js”. Contudo, nesse caso, fizemos isso para podermos saber se as notas estavam sendo salvas dentro do AsyncStorage.
+
+[00:18] Só que essas notas não vão ser mostradas dentro do editor, elas vão ser mostradas na página principal, no “App.js”. Essa função assíncrona de async function mostraNota() {} não deve ficar aqui.
+
+[00:31] Vou apagar essa função daqui e agora vamos para o nosso “App.js”, que não tem o AsyncStorage importado. Então, o primeiro passo vai ser importar o AsyncStorage.
+
+[00:44] Vou colocar o import depois do React Native. Então, import AsyncStorage from “@react-native-async-storage/async-storage”. Agora precisamos pegar todas as notas. Como fazemos isso?
+
+[01:08] Na documentação, nós usamos, na última vez, o getAllKeys, que nos retorna um array com todas as chaves que existem dentro do AsyncStorage. O que precisamos aqui é o getItem, porque vamos pegar apenas um item.
+
+[01:26] Temos o multiGet. O que esse multiGet faz? Ele procura por várias chaves dentro de um array. Ele recebe um array de chave, static: multiGet(keys: Array<string>. Podemos usar, então, o retorno e daquela função de getAllKeys para poder retornar para nós a lista de todas as entradas do AsyncStorage.
+
+[02:04] Vamos para o nosso código e vamos criar uma nova função. Como devolve para nós uma promise, vamos criar uma função assíncrona, async function, que vai se chamar async function mostraNotas() {.
+
+[02:25] O primeiro passo é pegar todas as chaves. Vamos criar a nossa constante const todasChaves = await AsyncStorage.getAllKeys. Nela temos todas as nossas chaves do nosso AsyncStorage.
+
+[02:47] O próximo passo é retornar todos os elementos guardados dentro do AsyncStorage. Com isso, precisamos de outro await AsyncStorage.multiGet(todasChaves).
+
+[03:06] Mas onde vamos salvar todas essas notas? Podemos criar um estado, dentro do nosso componente “App.js”, chamado notas. Então, const [notas, setNotas] = useState.
+
+[03:30] Ele vai inicializar com um vetor, um array vazio, const [notas, setNotas] = useState ([]), porque, no final, o retorno desse multiGet é um array de arrays.
+
+[03:44] Agora podemos salvar dentro do próprio setNotas. Antes vamos guardar isso em uma constate, const todasNotas = await AsyncStorage.multiGet(todasChaves) e vamos dar um setNotas(todasNotas).
+
+[04:07] Para verificar se está funcionando, podemos dar um console.log(notas). Salvei, porém, novamente, essa função não está sendo chamada em nenhum lugar.
+
+[04:22] Então é interessante que atualizemos o mostraNotas() depois que uma nova nota foi adicionada. Essa função mostraNotas() pode ser chamada dentro do NotaEditor, então vamos passá-la para lá.
+
+[04:35] Aqui onde temos o componente NotaEditor, vamos passar <NotaEditor mostraNotas=[mostraNotas]/>. Salvei o “App.js”. Dentro do NotaEditor, vamos receber essa função.
+
+[04:54] Na declaração da função, vou passar export default function NotaEditor((mostraNotas)) {. Depois que o salvaNotas rodou, ao final dele, onde está a nossa função antiga de mostraNota(), basta substituir por mostraNotas().
+
+[05:23] Vamos testar e ver se está funcionando. Ele deve mostrar, no nosso console, a nota que vai ser salva, já que temos o console.log aqui. Também deve mostrar para nós todas as notas que estão salvas dentro do AsyncStorage.
+
+[05:37] Vamos abrir o emulador, criar uma nova nota, com o título “Outra nota”. Em teoria, deve ter o ID 4 e devem ter quatro entradas dentro do AsyncStorage. Vamos conferir. Salvei a nota, ID 4, retornou-nos um Array [], vazio.
+
+[06:03] Mas não se preocupem, na verdade, porque ele está realmente salvando. Se formos no “App.js”, ao invés de dar um console.log(notas), podemos escrever console.log(todasNotas).
+
+[06:20] Se rodarmos de novo o emulador, “Outra nota > Salvar”, ele retorna para nós todas as entradas que estão sendo salvas. É só uma questão da sincronização do próprio Async await, mas as notas estão sendo salvas.
+
+[06:36] Já conseguimos mostrar todas as nossas notas no console.log, então, o próximo passo é colocá-las dentro do flatList. Vamos lá.
+
+@@04
+Mostrando as notas
+
+[00:00] O nosso próximo passo vai ser pegar todas essas notas e mostrar dentro de um flatList.
+[00:06] Podemos resgatar o componente de flatList e adicioná-lo logo antes do NotaEditor. Vou codar <flatList, ele é do próprio Native. Foi adicionado. Esse flatList pede algumas informações.
+
+[00:21] A primeira delas é o data, de onde vamos puxar as informações para iterar cada elemento de um array. Temos data=[notas], é exatamente onde queremos iterar.
+
+[00:33] A próxima informação que temos que passar é qual vai ser o componente renderizado dentro do flatList, que é o renderItem. E o item que vamos passar será para cada nota. Vamos passar o componente de Nota, renderItem-((nota) -> <Nota).
+
+[00:52] Um detalhe importante deste Nota é que ele não está no autoimport, então temos que importá-lo automaticamente. O "Nota.js" foi exportado sem default, então podemos importá-lo manualmente como import {Nota} from “./src/componentes/Nota”. Com isso, ele foi automaticamente.
+
+[01:15] Então escreveremos que a renderização é para cada elemento de nota renderItem={(nota) => <Nota />}. O próximo passo é o keyExtractor, que vai ser a chave única para cada um dos componentes renderizados dentro do flatList.
+
+[01:36] Lembrando de como funciona o multiGet: ele retorna para nós um array com vários arrays dentro. Na posição inicial, na posição 0, é uma identificação, e, na posição 1, a segunda posição, é o nosso conteúdo, o valor de verdade da nota.
+
+[02:00] Já que queremos colocar um ID, podemos usar a nota na posição inicial dela que é 0, ou seja, vai ser o ID, a identificação, keyExtractor={nota -> nota[0]}/>. Passando essas informações, fechando o flatList. Salvei.
+
+[02:18] Voltamos para a aplicação e está aqui a lista. Então, para cada vez que adicionar uma nova nota, ele vai carregar. Vou criar “Outra nota” e ele adicionou uma nova nota.
+
+[02:35] Só que queremos passar as informações das notas reais para dentro desses cartões. Então, dentro de “Nota.js”, temos que receber as informações de Nota. No “App.js”, antes de tudo, passamos esse objeto de Nota, que instanciamos antes, para dentro como objeto, renderItem=((nota) -> <Nota {...nota} />;
+
+[03:00] Passamos todas as informações que estão dentro dessa nota e agora, dentro de Nota, recebemos esse item, export function Nota({item }). Com este item, podemos ver o que está sendo retornado.
+
+[03:19] Já sabemos o que está sendo retornado, na verdade. É um array, a posição 0 é o ID, e a posição 1 e o texto. Então, podemos apagar esse Lorem Ipisum e colocar item na posição 1, que é a posição do texto, Text style={style.texto} numberOfLines={5}>{item[1]}</Text>.
+
+[03:35] Fechei as chaves e voltei para o meu emulador. Vou só autorizar e já fez automaticamente para nós. Ele já pegou todas as informações de cada uma das entradas do AsyncStorage e já mostrou dentro do cartão.
+
+Tela do aplicativo. Na metade superior da tela há um a lista com as notas salvas. Cada nota está apenas com o título em exibição, alinhado à esquerda, e entre às notas há uma linha de espessura média de cor alaranjada para separá-las
+
+[03:48] Com isso, nós conseguimos até fechar essa parte do AsyncStorage. Contudo, tenho algumas observações. Conforme formos criando mais notas, quando passarmos de uma certa quantidade, as novas notas são adicionadas depois da posição 1.
+
+[04:11] Por exemplo, ao criarmos várias notas em sequência, a última nota ficou abaixo de "Uma nota" ao invés de ficar lá no final da lista. Isso acontece porque o AsyncStorage trabalha com sorte, ele reorganiza as keys antes de retornar para nós no multiGet.
+
+[04:26] Então, ao invés de retornar por ordem de entrada no AsyncStorage, ele pega todas as chaves, dá um sort, organiza por ordem alfabética, já que são strings, e quem vier primeiro na ordem alfabética é quem aparece primeiro na lista. Essa é apenas uma observação com relação ao AsyncStorage.
+
+[04:54] Encerramos o AsyncStorage. O próximo passo é aprendermos uma coisa um pouco mais complexa, completa e robusta, que vai ser o SQLite. Vejo você no próximo vídeo.
+
+@@05
+Desafio: salvando objetos no AsyncStorage
+
+O AsyncStorage só consegue guardar strings como chave e valor, mas existe uma maneira de guardar objetos contendo mais informações. Podemos transformar um objeto JSON em uma string e depois guardar essa string no AsyncStorage. Para recuperar a informação, podemos receber seu conteúdo e depois transformar novamente em um objeto JSON.
+Pegue, como exemplo, o objeto abaixo:
+
+const umObjeto = {
+  id: "1",
+  titulo: "Um título",
+  texto: "Um texto qualquer"
+}COPIAR CÓDIGO
+Escreva duas funções, uma que guarde esse objeto no AsyncStorage e outra que mostre no console esse objeto recebido pelo AsyncStorage.
+
+O objetivo desta atividade é que você pratique a escrita de códidos que salvam objetos no AsyncStorage.
+Vamos ver a solução?
+
+A primeira função precisa preencher a estrutura básica da função .setItem(). Podemos colocar como chave umObjeto.id e como valor JSON.stringify(umObjeto). A função JSON.stringify() vai transformar nosso objeto em uma string, permitindo ser salvo dentro do AsyncStorage.
+
+async function salvaObjeto() {
+  const umObjeto = {
+    id: "1",
+    titulo: "Um título",
+    texto: "Um texto qualquer"
+  }
+  await AsyncStorage.setItem(umObjeto.id, JSON.stringify(umObjeto))
+}COPIAR CÓDIGO
+A segunda função utiliza a função .getItem() do AsyncStorage recebendo a chave "1". Depois pegamos esse resultado e salvamos em uma variável. Quando for imprimir no console precisamos transformar em um objeto novamente através da função JSON.parse().
+
+async function mostraObjeto() {
+  const entrada = await AsyncStorage.getItem("1")
+  console.log(JSON.parse(entrada))
+}COPIAR CÓDIGO
+Uma observação importante é que esta solução para guardar um objeto dentro do AsyncStorage não é ideal, dado que a função da ferramenta é guardar apenas strings. Considere essa solução como uma "gambiarra" e não como uma solução oficial.
+
+@@6
+Faça como eu fiz: exibindo notas em tela
+
+Agora é a sua vez! A partir do conteúdo visto nesta aula, implemente a funcionalidade de criar um id de maneira dinâmica para notas e exibir em tela todas as notas salvas no AsyncStorage. Siga os passos:
+Crie uma função que gera ids dinamicamente;
+Monte uma função que retorna todas as entradas dentro do AsyncStorage;
+Mostre todas as notas salvas dentro de uma FlatList.
+
+Você pode conferir sua resposta com o código abaixo:
+// NotaEditor.js
+import React, { useState } from "react"
+import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+export default function NotaEditor({mostraNotas}) {
+  const [texto, setTexto] = useState("")
+  const [modalVisivel, setModalVisivel] = useState(false)
+  async function salvaNota() {
+    const novoId = await geraId()
+    const umaNota = {
+      id: novoId.toString(),
+      texto: texto,
+    }
+    console.log(umaNota)
+    await AsyncStorage.setItem(umaNota.id, umaNota.texto)
+    mostraNotas()
+  }
+  async function geraId() {
+    const todasChaves = await AsyncStorage.getAllKeys()
+    if(todasChaves <= 0) {
+      return 1
+    }
+    return todasChaves.length + 1
+  }
+  return(
+    <>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisivel}
+        onRequestClose={() => {setModalVisivel(false)}}
+      >
+        <View style={estilos.centralizaModal}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={estilos.modal}>
+              <Text style={estilos.modalTitulo}>Criar nota</Text>
+              <Text style={estilos.modalSubTitulo}>Conteúdo da nota</Text>
+              <TextInput
+                style={estilos.modalInput}
+                multiline={true}
+                numberOfLines={3}
+                onChangeText={novoTexto => setTexto(novoTexto)}
+                placeholder="Digite aqui seu lembrete"
+                value={texto}/>
+              <View style={estilos.modalBotoes}>
+                <TouchableOpacity style={estilos.modalBotaoSalvar} onPress={() => {salvaNota()}}>
+                  <Text style={estilos.modalBotaoTexto}>Salvar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={estilos.modalBotaoCancelar} onPress={() => {setModalVisivel(false)}}>
+                  <Text style={estilos.modalBotaoTexto}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+      <TouchableOpacity onPress={() => {setModalVisivel(true)}} style={estilos.adicionarMemo}>
+        <Text style={estilos.adicionarMemoTexto}>+</Text>
+      </TouchableOpacity>
+    </>
+  )
+}
+// App.js
+import { FlatList, SafeAreaView, StatusBar, StyleSheet } from "react-native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import NotaEditor from "./src/componentes/NotaEditor"
+import { Nota } from "./src/componentes/Nota"
+import { useState } from "react"
+export default function App() {
+  const [notas, setNotas] = useState([])
+  async function mostraNotas() {
+    const todasChaves = await AsyncStorage.getAllKeys()
+    const todasNotas = await AsyncStorage.multiGet(todasChaves)
+    setNotas(todasNotas)
+    console.log(todasNotas)
+  }
+  return (
+    <SafeAreaView style={estilos.container}>
+      <FlatList
+        data={notas}
+        renderItem={(nota) => <Nota {...nota}/>}
+        keyExtractor={nota => nota[0]}/>
+      <NotaEditor mostraNotas={mostraNotas}/>
+      <StatusBar/>
+    </SafeAreaView>
+  )
+}
+
+@@07
+O que aprendemos?
+
+Nesta aula, vimos:
+Como criar uma identificação única de forma dinâmica;
+Funções para pegar todas as entradas do AsyncStorage;
+A utilização do FlatList para mostrar todas as notas na página principal.
