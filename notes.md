@@ -596,3 +596,406 @@ Nesta aula, vimos:
 Como criar uma identificação única de forma dinâmica;
 Funções para pegar todas as entradas do AsyncStorage;
 A utilização do FlatList para mostrar todas as notas na página principal.
+
+#### 13/01/2024
+
+@03-SQLite e banco de dados
+
+@@01
+Projeto da aula anterior
+
+Para acompanhar a partir deste ponto, você pode baixar o projeto completo da aula anterior neste link.
+
+https://github.com/alura-cursos/salvandoLocalmente/archive/refs/heads/aula2.zip
+
+@@02
+Dados compostos e relacionamentos
+
+[00:00] Anteriormente, eu comentei sobre as desvantagens de se utilizar o AsyncStorage. Vamos lembrar quais são essas desvantagens.
+[00:07] Uma das desvantagens, ou limitações, do AsyncStorage é: ele guarda apenas strings. No caso, estamos guardando apenas um texto, o conteúdo da nossa nota, mas e se quiséssemos guardar mais informações como, por exemplo, o título da nota e uma categoria além do texto da nota?
+
+[00:25] Para isso, teríamos que aumentar a quantidade de entradas do objeto JSON, transformá-lo em string, guardá-lo dentro do AsyncStorage, retirá-lo e transformá-lo em objeto JSON de novo para podermos trabalhar e preencher a nossa nota.
+
+[00:45] Isso, na verdade, é meio que uma adaptação para o AsyncStorage porque, na verdade, a função do AsyncStorage é guardar apenas strings.
+
+[00:53] Limitação de espaço. Isso é uma coisa específica até para o Android, porque é uma limitação do AsyncStorage com o Android. Se viermos na documentação do AsyncStorage, ela fala que o tamanho total que o AsyncStorage consegue guardar é de 6 MB.
+
+[01:13] Por entrada, existe uma limitação de 2 MB, então, a cada chave-valor só podemos guardar 2 MB de informação. Outra coisa muito importante é que as informações guardadas no AsyncStorage não são criptografadas.
+
+[01:26] Então, não é um lugar seguro para guardar informações sensíveis como, por exemplo, do cartão de crédito, senhas, ou qualquer outro tipo de informação sensível.
+
+[01:36] Não consegue fazer consultas. Vou explicar depois melhor o que são as consultas, mas, por exemplo, só conseguimos retirar informações do AsyncStorage com o objeto inteiro, a informação completa que vem dentro da chave-valor.
+
+[01:51] Nós não conseguimos pegar partes específicas que estão guardadas dentro do AsyncStorage. Por exemplo, no nosso objeto, pegar só o texto. Considerando o dado composto já com título, categoria e texto, ele não vai conseguir pegar informações distintas, como apenas o título.
+
+[02:08] Nós teríamos que pegar esse objeto e fazer um filtro manual, fazer uma função que vai filtrar e retornar para nós apenas a informação que precisamos.
+
+[02:19] Outra coisa é que o AsyncStorage não consegue lidar com relacionamentos. Como assim relacionamentos? O que são relacionamentos de dados?
+
+[02:30] Vou usar o exemplo de uma escola. Uma escola tem um aluno ou uma aluna que vai conter algumas informações: uma identificação única, porque a pessoa pode ter o mesmo nome e sobrenome que outra pessoa, o nome completo, a idade e o endereço,
+
+[02:47] Então, essas são as informações que vão montar o aluno ou a aluna. Outra coisa, esse aluno ou essa aluna está dentro de uma classe, e essa classe pertence a qual série? 1º do colegial, 1º do ginásio, 1º do fundamental?
+
+[03:05] Qual é a identificação dessa classe? Além disso, a classe está situada em qual andar dentro da escola? Quantos alunos tem dentro dessa classe? Essa classe está dentro de uma unidade, quantas unidades mais existem?
+
+[03:18] Pode ser que essa escola tenha uma filial no Brasil inteiro, na região Norte, na região Sul, na região Central. De onde é essa unidade?
+
+[03:27] Então isso acaba criando um relacionamento entre o aluno, a classe e a unidade. Cada um desses conjuntos contém informações específicas voltadas para eles mesmos.
+
+[03:40] A unidade vai ter o endereço de onde está situada, a classe vai ter as informações que eu falei, de série, andar e unidade, e o aluno vai ter praticamente todas essas informações, além das informações básicas de identificação única, que são nome, sobrenome, idade e endereço. Também tem que identificar a qual série, a qual classe e a qual unidade ele pertence.
+
+[04:11] Agora que entendemos relacionamentos, o SQLite? Eu tinha explicado, no começo do curso, que vamos trabalhar com dois modos de guardar dados dentro do nosso aplicativo: o AsyncStorage e o SQLite.
+
+[04:26] A função do AsyncStorage é simplesmente guardar informações mais simples, e até agora funcionou perfeitamente para o que precisávamos. Porém, agora que estamos trabalhando com dados um pouco mais compostos, completos e com relacionamentos, é importante que tenhamos uma ferramenta que consiga lidar com essas informações.
+
+[04:45] O SQLite vai ser um banco de dados. Quais são as vantagens de ter um banco de dados na aplicação? Ele nos permite fazer consultas e filtros. Voltando ao que eu tinha falado sobre o AsyncStorage sobre consultas, dentro da própria ferramenta de um banco de dados, nós conseguimos fazer essas buscas que vão retornar para apenas as informações necessárias.
+
+[05:11] Por exemplo, se procurarmos apenas as classes que temos dentro do meu banco de dados, conseguimos retornar apenas essas informações, em vez de pegar todo o conjunto de informações.
+
+[05:24] No caso do exemplo do aluno, no AsyncStorage, esse aluno teria todas as informações de aluno, classe e de unidade condensado em um lugar só.
+
+[05:36] No banco de dados, conseguimos isolar em tabelas cada uma dessas entidades. Depois conseguimos fazer filtros e consultas baseados nessas tabelas, nesses conjuntos de informações.
+
+[05:47] Por fim, conseguimos pegar apenas as informações que queremos através do banco de dados. Por exemplo, filtrar apenas por alunos que são pertencentes à classe tal. Se queremos apenas alunos que nasceram no dia tal, temos uma lista de alunos que nasceram na data tal.
+
+[06:07] Eu quero resgatar todas as unidades da região Norte, por exemplo, nós conseguimos fazer um filtro que, em vez de retornar alunos e classes, só vamos receber as informações necessárias que pedimos, que são as informações das unidades.
+
+[06:22] Ele consegue lidar com relacionamentos. Então foi isso que eu expliquei sobre ter vários conjuntos de dados que formam toda a estrutura da escola. A escola, na verdade, é um conjunto de alunos, classes e unidades, isso tudo forma a empresa escola, digamos assim.
+
+[06:38] Pode guardar imagens, vídeos, entre outros, o que era uma limitação do AsyncStorage, que só conseguia guardar strings. Aqui temos liberdade para guardar outras objetos como imagens dos alunos, vídeos de apresentações e áudios.
+
+[06:53] Garante informações mais seguras porque o jeito que ele guarda a informação criptografada. Existe uma própria segurança da ferramenta para guardar as informações, para que elas não sejam vazadas para outras pessoas.
+
+[07:07] Resumindo, aprendemos sobre as limitações do AsyncStorage, o relacionamento dos dados, o que é o SQLite, que é um banco de dados, e as vantagens de usarmos um banco de dados na nossa aplicação.
+
+[07:19] A seguir, vamos usar as informações que descobrimos para incrementar um pouco o nosso projeto. Eu usei o exemplo de criarmos título e categoria para a nossa nota, e é exatamente isso que faremos.
+
+[07:34] Então o nosso próximo passo será adicionar as informações de título e de categoria, usando uma ferramenta mais adequada para lidar com esse tipo de informação, que vai ser o SQLite. Vejo você no próximo vídeo.
+
+@@03
+Instalando o SQlite
+
+[00:00] Nosso próximo passo vai ser instalar o SQLite dentro do nosso projeto.
+[00:05] Toda vez que vamos instalar uma nova biblioteca no nosso projeto, é importante encerrar o aplicativo antes de instalar a nova biblioteca. Vou no meu Terminal e parei o nosso servidor, o nosso Expo.
+
+[00:18] Agora basta instalarmos o SQLite. Vou abrir a documentação e, logo no começo, vão ter informações sobre a instalação importando database, mas é importante irmos na parte de instalação, ou seja, a seção "Instalation".
+
+[00:34] Nela terá um comando para rodarmos no nosso Terminal, que instala o expo-sqlite. Vou copiar esse código, vou para o meu editor de código e dar um “Ctrl + V” no Terminal.
+
+[00:49] Detalhe, só por questão de consistência, para que você consiga acompanhar este curso, independentemente da época, recomendo a instalação da mesma versão que eu vou usar, que é a 10.1.0.
+
+[01:06] Depois, basta apertar “Enter” e esperar ele instalar no Terminal. Terminada a instalação, podemos agora iniciar o projeto novamente, npm start, e ver se ele ainda funciona.
+
+[01:20] Está funcionando, está ok. Temos agora o SQLite no nosso projeto, só que não estamos usando-o. A documentação deixa explícito como fazer isso, mas o nosso próximo passo é abrir a conexão com o banco de dados dentro do projeto.
+
+[01:41] Então, no nosso editor de código, vou criar um novo arquivo e a única função dele arquivo será abrir a conexão com o banco. Com essa conexão aberta, podemos fazer as queries, recuperar as informações do banco de dados e salvá-las dentro do banco de dados.
+
+[02:00] Só que esse arquivo não ficará dentro de "componentes", e sim dentro de uma nova pasta chamada “Services”. “Services” é onde guardamos todos os arquivos que trabalham com serviços, ou seja, é um serviço que faz a conexão com o banco, que nos fornece alguma informação, que faz algo para nós.
+
+[02:21] Dentro de "src", eu vou criar uma nova pasta chamada "servicos", então vou clicar em “src” com o botão direito do mouse, selecionar "New folder" e escrever "servicos". Dentro de “servicos”, vou criar um novo arquivo chamado “SQLite.js”, então vou clicar em "servicos" com o botão direito do mouse, selecionar "New File" e escrever "SQLite.js".
+
+[02:39] Agora precisamos importar tudo que é do SQLite, import * as SQLite from "expo-sqlite", e criar uma nova função chamada function abreConexao(){}, que terá o papel de abrir a conexão com o banco.
+
+[03:10] Para isso, vamos chamar o SQLite, nossa variável que acabamos de importar, com SQLite.openDatabase(), que é uma função. Essa função tem o retorno de um database e nós precisamos salvar esse retorno em algum lugar.
+
+[03:30] Então vou criar uma constante, const database. Dentro dessa função de SQLite.openDatabase(), só precisamos passar uma informação que é o nome do database que vamos criar. Vou chamá-lo de const database = SQLite.openDatabase(“db.db”).
+
+[03:50] Agora vamos retornar return database e vamos exportar, export db, que vai ser o retorno da função do abreConexao, então, export const db = abreConexao().
+
+[04:16] Assim, ficará salva a nossa constante db com a conexão aberta. Agora podemos importar esse db em outro arquivo que vai cuidar só das nossas queries. Então, isolamos as responsabilidades.
+
+[04:30] No arquivo de “SQLite.js”, a única função será a de abrir a conexão com o banco de dados. Agora que temos a conexão aberta, podemos fazer as transações com o banco de dados em outro arquivo, que será o arquivo das notas.
+
+[04:42] Salvei esse arquivo. O próximo passo será criar o arquivo que irá salvar e trabalhar com as notas dentro do banco de dados. Vejo você no próximo vídeo.
+
+@@04
+Para saber mais: sobre serviços
+
+Durante o curso, foi criada uma pasta chamada servicos, onde o arquivo SQLite.js está localizado. Fizemos isto pela razão de que, no desenvolvimento de código, uma boa prática é isolar funcionalidades dentro do projeto. O que for componente fica em uma pasta componentes, o que for lógica fica em outra pasta, etc.
+A pasta de servicos guarda toda a lógica que conversa com aplicações externas, neste caso, o SQLite.
+
+No caso do AsyncStorage, não precisamos criar essa pasta e arquivos, pois a própria ferramenta nos dá as funções que conversam com a aplicação AsyncStorage, basta apenas implementar em nosso projeto.
+
+Lembrando que a sua aplicação não vai quebrar sem a pasta servicos, é apenas uma convenção para melhorar a visibilidade e manutenção da aplicação. Assim, se você precisar fazer uma manutenção no código, saberá encontrar mais facilmente a parte responsável p
+
+@@05
+Para saber mais: banco de dados
+
+Ao longo desta aula, utilizamos conceitos relacionados a banco de dados e modelagem de dados, que cria um sistema de armazenamento local. Não é obrigatório que você seja expert nesses assuntos, mas estudar um pouco sobre isso pode ajudar muito seu dia a dia de trabalho.
+Pensando nisso, separamos alguns conteúdos para você:
+
+Curso: Modelagem de banco de dados relacional: entidades, relacionamentos e atributos
+Artigo: Entidade: atributos simples, compostos e multivalorados
+
+https://www.alura.com.br/curso-online-modelagem-banco-relacional-entidade-relacionamento-atributo?_gl=1*eqfvag*_ga*MTgwMzIzMjk2Ni4xNjg4ODE5OTcz*_ga_1EPWSW3PCS*MTcwNTE4MDg2MC4xNjIuMS4xNzA1MTgyMTkyLjAuMC4w*_fplc*T1RTRnJxZ0g0WHFvbSUyRmVHakRDUDFhVTV6eTROUGxRSmEwMmVKRnNHYzRxZmdrZ0g4cWs4WlcxbUNXSFNIRXglMkJCUUtjNEUlMkJTTE1Ed2dzYkxhZzNtZUViQWVsMmFzWlROSjFvaEY3SkYyaURwMGxZUmZ3ZWNkQlA4MnBMbHV3JTNEJTNE
+
+https://www.luis.blog.br/analise-de-entidade-atributos-simples-compostos-multivalorados.html
+
+@@06
+A tabela de notas
+
+[00:00] Agora que temos a nossa conexão com o banco de dados, o próximo passo será criar o arquivo que cuidará dos relacionamentos entre as notas e o banco de dados, guardando assim as informações dentro do banco de dados.
+[00:12] Novamente, isolando essas funcionalidades, eu vou criar um novo arquivo, dentro da pasta “servicos”, chamado de “notas.js”. Para conversarmos com o banco de dados e fazermos as queries, precisamos de uma conexão com o banco para fazer transações com o banco de dados.
+
+[00:29] Primeiro, precisamos importar a nossa constante db, que foi criada dentro do arquivo “SQLite.js”, escrevendo import { db } from “./SQLite” no nosso arquivo. Como está no mesmo nível de pastas, podemos chamar de ./SQLite.
+
+[00:45] O que fazemos com isso agora? Primeiro precisamos inicializar a tabela. Vou criar uma nova função com function criaTabela() {. Dentro dela vamos chamar o db.
+
+[01:00] A partir do db, precisamos fazer uma transação, que pode ser uma query. Vou criar um db.transaction e agora ele imediatamente faz uma função de call-back, que vai receber dentro dela uma transaction, ou seja, uma transação.
+
+[01:19] Vou escrever db.transaction((transaction) => e, dentro da arrow function, passamos o transaction. Nela podemos fazer um transaction.executeSql. Aqui dentro é onde escrevemos o nosso statement, ou seja, o nosso texto que é o nosso comando SQL.
+
+[01:38] Agora tudo será escrito no formato de string. Qual será o comando? Cada linguagem de banco tem o seu jeito de escrever. Toda palavra reservada do SQLite, eu prefiro escrever com letra maiúscula, tudo em “CAPS”, para garantir que vai funcionar.
+
+[02:00] Tem algumas linguagens que não têm problema com isso, você pode escrever em camel case, ou seja, pode escrever tudo minúsculo, não tem problema. Por precaução, eu prefiro escrever tudo com letra maiúscula, porque são palavras reservadas da linguagem, e em letras minúsculas, a depender do caso, para as coisas que são minhas.
+
+[02:21] Vou colocar tudo em “CAPS”, transaction.executeSql(“CREATE TABLE IF NOT EXISTS”), porque vamos rodar essa função assim que a aplicação for executada. A aplicação será aberta e precisará de uma tabela, ou seja, de acesso ao banco de dados, senão, ela não vai adicionar nota em nenhum lugar, porque não vai existir o banco de dados.
+
+[02:43] Caso já exista esse banco de dados e a tabela já tenha sido criada, ele não precisa criar nada, ele simplesmente prossegue para o próximo passo. Contudo, se for a primeira vez que o aplicativo estiver iniciando, a tabela ainda não existirá e precisará ser criada. Por isso é importante.
+
+[03:03] Outro detalhe: para facilitar a visualização das linhas do statement que estou escrevendo, eu vou quebrar em linhas. O detalhe importante é que eu escrevi agora "CREATE TABLE IF NOT EXISTS" e já fechei aspas logo em seguida.
+
+[03:17] Vou pressionar “Espaço”, deixando um espaço vazio do lado de EXISTS", o que é muito importante. Depois do fechamento das aspas, eu vou concatenar, pressionar “Enter + Tab” e continuar escrevendo o meu statement, transaction.executeSql("CREATE TABLE IF NOT EXISTS" +. Em seguida, pressionamos "Enter".
+
+[02:36] Precisamos passar agora o nome da tabela, que vai ser "Notas ". Pressionamos "Espaço" antes do fechamento das aspas e concatenamos, ou seja, escrevemos <+>. Em seguida, pressionamos “Enter” e escrevemos apenas as "").
+
+[03:51] Agora passamos nessas aspas vazias o que terá dentro dessas notas, ou seja, o ID. O que será o ID? A identificação vai ser inteira, a chave primária para o banco de dados e o autoincrement, que é uma coisa que faltada no AsyncStorage. Nós fizemos uma função chamada criaId para gerar um ID automático para nós.
+
+[04:13] Aqui, o próprio SQLite vai fazer o ID automaticamente. Então abrimos parênteses e a primeira identificação vai ser o ID, escrevendo tudo em “CAPS”, “(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, categoria TEXT, texto TEXT)”).
+
+[05:02] Terminei de escrever, fechei os parênteses. Depois dos parênteses, antes do fechamento das aspas – isso é muito importante –, ponto e vírgula: “(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, categoria TEXT, texto TEXT);”).
+
+[05:14] Porque, novamente, dependendo da linguagem do banco onde você vai escrever, o ponto e vírgula indica o fechamento do statement. Sem o ponto e vírgula, o banco não considera que foi terminada a escrita do statement, e ele tentará juntar com a outra chamada de statement, gerando uma confusão. Sendo assim, usamos o ponto e vírgula para fechar o statement do nosso banco.
+
+[05:44] Temos agora o nosso criaTabela, só que ela não é exportada, não temos como usá-la ainda. Portanto, no começo do código, vamos adicionar o comando export, ou seja, export function criaTabela().
+
+[05:55] Salvei e agora vamos chamar essa função assim que a nossa aplicação é inicializada. No nosso “App.js”, vamos usar o useEffect, que é do próprio React. Ele vai ter o call-back, useEffect((_ -> {,em que vai importar aquele criaTabela().
+
+[06:27] Importou certo a tabela do Notas, precisamos, só para finalizar, do array vazio, }, []). Salvei e voltei para o meu aplicativo e parece que está tudo ok.
+
+[06:43] O que acontece? Toda vez que esse aplicativo iniciar, ele vai tentar criar a tabela de notas. Caso a tabela não exista, ele vai criá-la, caso exista, ele não prossegue para onde tem que ir.
+
+[06:59] O que podemos fazer aqui também é limpar algumas funcionalidades do AsyncStorage que não vamos mais usar. Vou deixar as funções salvas, o nome das funções já criadas, mas vou apagar o conteúdo delas.
+
+[07:16] Tudo que tem o AsyncStorage, vou apagar. Dentro do mostraNotas(), vou apagar tudo que tem a ver com o AsyncStorage, inclusive o import dele no nosso projeto.
+
+[07:29] Dentro do “NotaEditor.js”, outro lugar que usamos, temos o geraId(), que não precisa mais existir, porque o próprio banco vai fazer isso por nós, então apagaremos toda a função.
+
+[07:44] Na função salvaNota(), o await AsyncStorage não precisa existir mais, então vamos apagar essa linha, e essa função geraId() também não existe mais, então apagamos a linha da const novoId. Deixei só umaNota e, para o ID não ficar vazio, vou deixar uma string com "1", então id: "1",, deixando algo guardado.
+
+[08:00] Também apagaremos o import do nosso “NotaEditor.js”. O próximo passo será escrever as queries que criarão uma nova nota no nosso banco, e recuperarão as informações para nós. E vamos preenchendo o nosso aplicativo com essas informações.
+
+[08:21] Vejo você no próximo vídeo.
+
+@@07
+Adaptando o projeto
+
+[00:00] Antes de começarmos a escrever as queries e as funções que vão pegar as informações do banco de dados, vamos adaptar o nosso projeto para receber as novas informações dos cartões.
+[00:10] Então, vamos adicionar as entradas de título, de categoria, e adaptar o cartão para poder mostrar essas informações. No nosso “NotaEditor.js”, vamos ter duas varáveis novas.
+
+[00:22] Vamos ter a constante de título, const [titulo, setTitulo] = useState(“ “), começando com um título vazio, e a const [categoria, setCategoria] = useState().
+
+[00:50] Eu não vou iniciar a categoria vazia porque, quando eu for selecionar uma categoria, eu quero que ela venha de um picker. Esse picker precisa ter um valor inicial que precisa ser alguma coisa, não pode ser vazio.
+
+[01:03] Então, vamos ter agora três categorias, que vai ser “Pessoal”, “Trabalho” e “Outros”, e eu quero inicializar com o primeiro, que vai ser o Pessoal. Assim, ao invés de ser uma string vazia inicializada, vai ser const [categoria, setCategoria] = useState(“Pessoal”).
+
+[01:20] Agora, dentro do "componente", na parte mais visual, podemos copiar esse Text e TextInput, de onde vem o conteúdo da nota. Em Text, podemos alterar de Conteúdo para Título da nota.
+
+[01:40] No TextInput, a estilização está certa, mas não temos mais multiline e nem numberOfLines, então vamos apagar essas duas linhas. No onChangeText, precisamos alterar para novoTitulo e, invés de ser setTexto, vai ser setTitulo, passando o nosso novoTitulo. Então, onchangeText={novoTitulo -> setTitulo (novoTitulo)}.
+
+[02:03] O placeholder será placeholder=”Digite um título” e o value será value={titulo}/>. Para o picker, complica um pouco, porque o React Native não tem um componente de picker por padrão.
+
+[02:22] Então, eu vou instalar um componente de picker que se chama react-native-picker. Para isso, preciso instalar uma biblioteca nova e, portanto, tenho que encerrar a aplicação. Finalizei, escrevo npm install @react-native-picker/picker no Terminal e a versão que eu vou usar é a `@2.2.1`.
+
+[02:53] Pressionei “Enter”, basta esperar o NPM instalar. Depois de instalado, podemos importar no projeto, só que, para utilizarmos o picker, temos que englobá-lo dentro de uma view.
+
+[03:07] Então, vou criar uma nova View dentro do TextInput em "NotaEditor.js". A View já está importada no projeto e ela terá um style que já existe dentro do projeto, View style={estilos.modalPicker}>.
+
+[03:36] Dentro deste código, temos o componente de <Picker, que importou sozinho. Dentro do objeto de <Picker, precisamos passar duas informações. Uma delas é o selectedValue, e ela vai estar qual o valor inicial, ou seja, o valor default desse picker.
+
+[03:56] Por isso que é importante ter inicializado com alguma coisa dentro, como foi o caso do “Pessoal”, porque senão ele ia inicializar como vazio e, caso não selecionássemos e pegássemos o valor que aparece no picker sem mudar nada, ele ia pegar um valor vazio.
+
+[04:13] Então, selectedValue={categoria}. Outra informação importante de passarmos é a que passamos no TextInput, ou seja, o onChange. Porém, ao invés de ser onChangeText, vai ser onValueChange.
+
+[04:30] Agora, a mesma coisa que fizemos com o input: onValueChange={novaCategoria => setCategoria(novaCategoria)}. Dentro do <Picker, vamos chamar outro componente que é o <Picker.Item.
+
+[04:52] Nele passamos duas informações, a label, que é o nome daquela categoria, e o value, o valor que vai ser enviado do banco de dados. Então, <Picker.Item label="Pessoal" value="Pessoal"/>. Essa tag é auto-fechável.
+
+[05:18] Copiamos esse trecho, colamos mais duas vezes para criar as labels. Agora preencheremos o segundo valor, substituindo "Pessoal", por "Trabalho". No último, de "Pessoal" mudamos para "Outros", representando outras categorias.
+
+[05:34] Finalizamos as alterações do “NotaEditor.js”. O próximo será o “Nota.js”. Antes, vamos conferir como ficou. Temos que inicializar novamente, digitando npm start no terminal e pressionando "Enter" para iniciar o serviço novamente.
+
+[05:47] Abri a modal, clicando no "+" no canto inferior direito. Nela está o título da nota e o picker. Inclusive, faltou colocar um título para o picker, porque ele está acabando de repente. Vou voltar para o nosso código do "NotaEditor.js" e inserir um Text antes do View do nosso Picker.
+
+[06:12] O título do picker será "Categoria", então <Text style[{estilos.modalSubstitulo}>Categoria</Text>. Vejamos como ficou. “Categoria”, está aqui. “Pessoal, Trabalho, Outros”.
+
+[06:28] O próximo vai ser mudar a nota, então vamos no componente “Nota.js”. Tenho que fazer uma leve alteração que acabei esquecendo de mudar. Alterar a variável style, na function Nota(), para estilos.
+
+[05:47] No return(), alteramos style.cartao para estilos.cartao e estilos.texto. Em seguida, adicionamos duas entradas. Temos agora o Text style={estilos.titulo}></Text>, vou deixar vazio por enquanto, e o <Text style={estilos.categoria}></Text>.
+
+[07:27] Outra coisa para arrumar. Temos a styleFunction(categorias[]) e precisamos da lista de categorias para pegar as cores de cada categoria.
+
+[07:37] Eu tinha deixado [Pessoal] porque não tínhamos essa categoria antes. Agora, como vamos receber essa categoria do banco de dados, podemos deixar um valor vazio por enquanto, então const estilos = styleFunction(categorias[""]).
+
+[07:46] Porque as informações de título, a categoria e até mesmo o texto do conteúdo da nota virão do banco de dados, então podemos preencher essas informações depois.
+
+[08:00] Já preparamos o nosso projeto para receber as informações do banco de dados, para as novas informações que vão ser recebidas dentro da nota. O próximo passo vai ser pegar as informações e salvá-las no banco de dados. Vejo você no próximo vídeo.
+
+@@08
+Faça como eu fiz: implementando SQLite
+
+Agora é a sua vez! A partir do conteúdo visto nesta aula, implemente o SQLite em seu projeto.
+Siga os passos:
+
+Instale o SQLite na versão 10.1.0;
+Separe a responsabilidade de trabalhar com o banco de dados em uma pasta de serviços;
+Crie a função que abre a conexão com o banco de dados;
+Crie a função que monta a tabela de notas com as seguinte colunas: id, título, categoria e texto;
+Limpe as importações e funções remanescentes do AsyncStorage;
+Adapte os componentes NotaEditor.js e Nota.js para receber as novas informações de uma nota;
+Utilize o componente Picker na versão 2.2.1 para selecionar uma categoria. O componente Picker tem como única função dar a funcionalidade da tag <select> do HTML, pois no React Native, por padrão, não existe uma ferramenta para criar um menu de opções.
+Para saber mais sobre a tag <select> veja a documentação neste link.
+
+https://developer.mozilla.org/pt-BR/docs/Web/HTML/Element/select
+
+Nesta atividade, o objetivo é instalar o SQLite e abrir a conexão com o banco de dados.
+Você pode conferir sua resposta com o código abaixo:
+
+// NotaEditor.js
+import { Picker } from "@react-native-picker/picker"
+import React, { useState } from "react"
+import { Modal, View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from "react-native"
+export default function NotaEditor({mostraNotas}) {
+  const [titulo, setTitulo] = useState("")
+  const [categoria, setCategoria] = useState("Pessoal")
+  const [texto, setTexto] = useState("")
+  const [modalVisivel, setModalVisivel] = useState(false)
+  async function salvaNota() {
+    const umaNota = {
+      id: "1",
+      texto: texto,
+    }
+    console.log(umaNota)
+    mostraNotas()
+  }
+  return(
+    <>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisivel}
+        onRequestClose={() => {setModalVisivel(false)}}
+      >
+        <View style={estilos.centralizaModal}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <View style={estilos.modal}>
+              <Text style={estilos.modalTitulo}>Criar nota</Text>
+              <Text style={estilos.modalSubTitulo}>Título da nota</Text>
+              <TextInput
+                style={estilos.modalInput}
+                onChangeText={novoTitulo => setTitulo(novoTitulo)}
+                placeholder="Digite um título"
+                value={titulo}/>
+              <Text style={estilos.modalSubTitulo}>Categoria</Text>
+              <View style={estilos.modalPicker}>
+                <Picker
+                  selectedValue={categoria}
+                  onValueChange={novaCategoria => setCategoria(novaCategoria)}>
+                    <Picker.Item label="Pessoal" value="Pessoal"/>
+                    <Picker.Item label="Trabalho" value="Trabalho"/>
+                    <Picker.Item label="Outros" value="Outros"/>
+                </Picker>
+              </View>
+              <Text style={estilos.modalSubTitulo}>Conteúdo da nota</Text>
+              <TextInput
+                style={estilos.modalInput}
+                multiline={true}
+                numberOfLines={3}
+                onChangeText={novoTexto => setTexto(novoTexto)}
+                placeholder="Digite aqui seu lembrete"
+                value={texto}/>
+              <View style={estilos.modalBotoes}>
+                <TouchableOpacity style={estilos.modalBotaoSalvar} onPress={() => {salvaNota()}}>
+                  <Text style={estilos.modalBotaoTexto}>Salvar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={estilos.modalBotaoCancelar} onPress={() => {setModalVisivel(false)}}>
+                  <Text style={estilos.modalBotaoTexto}>Cancelar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </ScrollView>
+        </View>
+      </Modal>
+      <TouchableOpacity onPress={() => {setModalVisivel(true)}} style={estilos.adicionarMemo}>
+        <Text style={estilos.adicionarMemoTexto}>+</Text>
+      </TouchableOpacity>
+    </>
+  )
+}
+// Nota.js
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
+export function Nota({item}) {
+  const categorias = {Pessoal: "#FF924F", Outros: "#00911F", Trabalho: "#2F71EB"}
+  const estilos = styleFunction(categorias[""])
+
+  return (
+    <View style={estilos.cartao}>
+      <Text style={estilos.titulo}></Text>
+      <Text style={estilos.categoria}></Text>
+      <Text style={estilos.texto} numberOfLines={5}>{item[1]}</Text>
+    </View>
+  )
+}
+// App.js
+import { FlatList, SafeAreaView, StatusBar, StyleSheet } from "react-native"
+import NotaEditor from "./src/componentes/NotaEditor"
+import { Nota } from "./src/componentes/Nota"
+import { useEffect, useState } from "react"
+import { criaTabela } from "./src/servicos/Notas"
+export default function App() {
+  useEffect(() => {
+    criaTabela()
+  }, [])
+  const [notas, setNotas] = useState([])
+  async function mostraNotas() {
+    setNotas(todasNotas)
+    console.log(todasNotas)
+  }
+  return (
+    <SafeAreaView style={estilos.container}>
+      <FlatList
+        data={notas}
+        renderItem={(nota) => <Nota {...nota}/>}
+        keyExtractor={nota => nota[0]}/>
+      <NotaEditor mostraNotas={mostraNotas}/>
+      <StatusBar/>
+    </SafeAreaView>
+  )
+}
+// SQLite.js
+import * as SQLite from "expo-sqlite"
+function abreConexao() {
+  const database = SQLite.openDatabase("db.db")
+  return database
+}
+export const db = abreConexao()
+// Notas.js
+import { db } from "./SQLite"
+export function criaTabela() {
+  db.transaction((transaction) => {
+    transaction.executeSql("CREATE TABLE IF NOT EXISTS " +
+      "Notas " +
+      "(id INTEGER PRIMARY KEY AUTOINCREMENT, titulo TEXT, categoria TEXT, texto TEXT);")
+  })
+}COPIAR CÓDIGO
+
+@@09
+O que aprendemos?
+
+Nesta aula, vimos:
+As vantagens e desvantagens da ferramenta atual (AsyncStorage);
+Instalação do SQLite;
+Separação da responsabilidade de acessar o banco de dados dos componentes principais;
+A criação da tabela de Notas;
+Como criar statements/queries para acessar informações do banco de dados.
